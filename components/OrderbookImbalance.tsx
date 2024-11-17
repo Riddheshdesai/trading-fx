@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useMemo } from "react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
+import GaugeChart from "react-gauge-chart";
 
 interface OrderbookImbalanceProps {
   orderBook: {
@@ -12,7 +14,6 @@ interface OrderbookImbalanceProps {
 const OrderbookImbalance: React.FC<OrderbookImbalanceProps> = ({
   orderBook,
 }) => {
-  // Calculate imbalance
   const imbalance = useMemo(() => {
     const totalBids = orderBook?.bids.reduce(
       (sum, [_, quantity]) => sum + quantity,
@@ -23,46 +24,48 @@ const OrderbookImbalance: React.FC<OrderbookImbalanceProps> = ({
       0
     );
 
-    // Avoid division by zero
     if (totalBids + totalAsks === 0) return 0;
 
-    // Calculate imbalance percentage
     return ((totalBids - totalAsks) / (totalBids + totalAsks)) * 100;
   }, [orderBook]);
 
-  // Get the rotation angle based on the imbalance value
-  const angle = (imbalance / 100) * 180 - 90; // -100 -> -90°, 100 -> 90°
+  const mappedPercentage = useMemo(() => {
+    let mappedValue;
+
+    if (imbalance <= 0) {
+      mappedValue = (imbalance + 100) * 0.5;
+    } else {
+      mappedValue = 50 + imbalance * 0.5;
+    }
+
+    return mappedValue;
+  }, [imbalance]);
+
+  const formatTextValue = (value: number) => {
+    const percentage = value * 100;
+    return `${percentage.toFixed(2)}%`;
+  };
 
   return (
-    <div className="orderbook-imbalance text-center space-y-4">
-      <h3 className="text-lg font-semibold">Orderbook Imbalance</h3>
-
-      <div className="relative w-48 h-24 mx-auto">
-        {/* Half-circle background with gradient */}
-        <div
-          className="absolute top-0 left-0 w-full h-full rounded-full bg-gradient-to-r from-red-500 via-white to-green-500"
-          // style={{
-          //   clipPath: "polygon(50% 0%, 0% 100%, 100% 100%)",
-          // }}
+    <Card className="col-span-12 lg:col-span-4">
+      <CardHeader>
+        <CardTitle>Orderbook Imbalance Indicator</CardTitle>
+        <CardDescription>Live Orderbook Imbalance Indicator (Bids and Asks)</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <GaugeChart
+          id="gauge-chart1"
+          nrOfLevels={2}
+          colors={["#E8260F", "#12E80F "]}
+          percent={mappedPercentage / 100}
+          textColor={"#000"}
+          hideText={true}
         />
-
-        {/* Rotating arrow */}
-        <div
-          className="absolute bottom-0 left-1/2 transform -translate-x-1/2 transition-transform duration-500"
-          style={{
-            transform: `rotate(${angle}deg)`,
-          }}
-        >
-          <div className="w-1 h-12 bg-black rounded-full" />
+        <div className="flex items-center justify-center text-lg font-semibold">
+          {imbalance.toFixed(0)}%
         </div>
-      </div>
-
-      <p className="text-sm">
-        {imbalance > 0
-          ? `Buy pressure: +${imbalance.toFixed(2)}%`
-          : `Sell pressure: ${imbalance.toFixed(2)}%`}
-      </p>
-    </div>
+      </CardContent>
+    </Card>
   );
 };
 

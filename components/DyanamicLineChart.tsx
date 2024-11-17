@@ -1,7 +1,14 @@
 "use client";
 
 import { TrendingUp } from "lucide-react";
-import { CartesianGrid, Line, LineChart, XAxis, YAxis, LabelList } from "recharts";
+import {
+  CartesianGrid,
+  Line,
+  LineChart,
+  XAxis,
+  YAxis,
+  LabelList,
+} from "recharts";
 import {
   Card,
   CardContent,
@@ -10,7 +17,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import {
+  ChartConfig,
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
 import { useEffect, useMemo, useState } from "react";
 
 interface SpreadIndicatorProps {
@@ -20,23 +32,20 @@ interface SpreadIndicatorProps {
 const DyanamicLineChart: React.FC<SpreadIndicatorProps> = ({ orderBook }) => {
   const [spreadData, setSpreadData] = useState<{ x: number; y: number }[]>([]);
 
-  // Calculate the spread value (difference between highest bid and lowest ask)
   const spread = useMemo(() => {
     const highestBid = orderBook?.bids.length ? orderBook.bids[0][0] : 0;
     const lowestAsk = orderBook?.asks.length ? orderBook.asks[0][0] : 0;
     return highestBid && lowestAsk ? lowestAsk - highestBid : 0;
   }, [orderBook]);
 
-  // Update the chart data in real-time
   useEffect(() => {
     const now = Date.now();
     setSpreadData((prev) => {
       const updated = [...prev, { x: now, y: spread }];
-      return updated.length > 60 ? updated.slice(1) : updated; // Keep the last 60 data points
+      return updated.length > 60 ? updated.slice(1) : updated;
     });
   }, [spread]);
 
-  // Custom chart configuration
   const chartConfig = {
     desktop: {
       label: "Market Depth",
@@ -45,9 +54,9 @@ const DyanamicLineChart: React.FC<SpreadIndicatorProps> = ({ orderBook }) => {
   } satisfies ChartConfig;
 
   return (
-    <Card>
+    <Card className="col-span-12 lg:col-span-8">
       <CardHeader>
-        <CardTitle>Market Depth Line Chart</CardTitle>
+        <CardTitle>Market Spread Line Chart</CardTitle>
         <CardDescription>Live Market Data (Spread)</CardDescription>
       </CardHeader>
       <CardContent>
@@ -63,13 +72,13 @@ const DyanamicLineChart: React.FC<SpreadIndicatorProps> = ({ orderBook }) => {
             <CartesianGrid vertical={false} />
             <XAxis
               dataKey="x"
-              tickFormatter={(value) => new Date(value).toLocaleTimeString()} // Format x-axis as time
+              tickFormatter={(value) => new Date(value).toLocaleTimeString()}
               tickLine={false}
               axisLine={false}
               tickMargin={8}
             />
             <YAxis
-              orientation="left" // Position the Y-axis on the left
+              orientation="left"
               tickLine={false}
               axisLine={false}
               tickMargin={8}
@@ -87,25 +96,10 @@ const DyanamicLineChart: React.FC<SpreadIndicatorProps> = ({ orderBook }) => {
               activeDot={{
                 r: 6,
               }}
-            >
-              {/* <LabelList
-                position="top"
-                offset={12}
-                className="fill-foreground"
-                fontSize={12}
-              /> */}
-            </Line>
+            ></Line>
           </LineChart>
         </ChartContainer>
       </CardContent>
-      <CardFooter className="flex-col items-start gap-2 text-sm">
-        <div className="flex gap-2 font-medium leading-none">
-          Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
-        </div>
-        <div className="leading-none text-muted-foreground">
-          Showing the current market spread for the last 60 seconds.
-        </div>
-      </CardFooter>
     </Card>
   );
 };

@@ -6,6 +6,6 @@ interface SymbolStore {
 }
 
 export const useSymbolStore = create<SymbolStore>((set) => ({
-  symbol: "", 
+  symbol: "btcusdt", 
   setSymbol: (newSymbol) => set({ symbol: newSymbol }),
 }));

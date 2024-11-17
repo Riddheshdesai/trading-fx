@@ -1,3 +1,5 @@
+"use client";
+
 import { useOrderBook } from "@/hooks/use-orderblock";
 import { useSymbolStore } from "@/store/useTradingStore";
 import React from "react";
@@ -5,26 +7,29 @@ import OrderBook from "./Orderbook";
 import DyanamicLineChart from "./DyanamicLineChart";
 import MarketDepthChart from "./MarketDepthChart";
 import OrderbookImbalance from "./OrderbookImbalance";
+import Loader from "./Loader";
 
 export default function FxPairData() {
   const { symbol } = useSymbolStore();
   const { data, isLoading, isError } = useOrderBook(symbol);
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="min-h-screen flex justify-center items-center">
+        <Loader />
+      </div>
+    );
   }
 
   if (isError) {
     return <div>Error loading order book data</div>;
   }
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">Real-Time Order Book</h1>
+    <div className="grid grid-cols-12 gap-4 md:gap-6 2xl:gap-7.5">
       <OrderBook orderBook={data} />
       <DyanamicLineChart orderBook={data} />
-      <MarketDepthChart orderBook={data} />
-      {/* <SpreadIndicator orderBook={data} /> */}
       <OrderbookImbalance orderBook={data} />
+      <MarketDepthChart orderBook={data} />
     </div>
   );
 }

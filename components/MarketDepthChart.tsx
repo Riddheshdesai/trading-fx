@@ -17,7 +17,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 interface MarketDepthChartProps {
   orderBook: { bids: [number, number][]; asks: [number, number][] };
@@ -25,44 +25,56 @@ interface MarketDepthChartProps {
 
 const MarketDepthChart: React.FC<MarketDepthChartProps> = ({ orderBook }) => {
   const [marketDepthData, setMarketDepthData] = useState<
-  { x: number; bid: number; ask: number }[]
+    { x: number; bid: number; ask: number }[]
   >([]);
-  
-  if (!orderBook) return <div>loading</div>;
-  // Prepare market depth data based on the order book
-  const marketDepth = useMemo(() => {
-    const bidData = orderBook?.bids.map(([price, qty]) => ({
-      x: price,
-      bid: qty,
-    }));
-    const askData = orderBook?.asks.map(([price, qty]) => ({
-      x: price,
-      ask: qty,
-    }));
 
-    // Merge bids and asks, sort by price (ascending order)
-    const mergedData = [...bidData, ...askData]
-      .filter((data) => data.bid > 0 || data.ask > 0) // Filter out points where both bid and ask are zero
-      .sort((a, b) => a.x - b.x);
+  if (!orderBook || !orderBook.bids || !orderBook.asks) {
+    return <div>Loading...</div>;
+  }
+
+  const marketDepth = useMemo(() => {
+    const bidMap = new Map<number, number>();
+    orderBook.bids.forEach(([price, qty]) => {
+      bidMap.set(price, qty);
+    });
+
+    const askMap = new Map<number, number>();
+    orderBook.asks.forEach(([price, qty]) => {
+      askMap.set(price, qty);
+    });
+
+    const mergedData = [];
+
+    const allPrices = new Set([
+      ...orderBook.bids.map(([price]) => price),
+      ...orderBook.asks.map(([price]) => price),
+    ]);
+
+    allPrices.forEach((price) => {
+      const bidQty = bidMap.get(price) || 0;
+      const askQty = askMap.get(price) || 0;
+      mergedData.push({ x: price, bid: bidQty, ask: askQty });
+    });
+
+    mergedData.sort((a, b) => a.x - b.x);
 
     return mergedData;
   }, [orderBook]);
 
-  // Update marketDepthData state when marketDepth changes
-  useMemo(() => {
+  useEffect(() => {
     if (marketDepth?.length) {
-      setMarketDepthData(
-        marketDepth.map((depthData) => ({
-          x: depthData.x,
-          bid: depthData.bid || 0, // Ensure bid data exists
-          ask: depthData.ask || 0, // Ensure ask data exists
-        }))
-      );
+      const formattedData = marketDepth.map((depthData) => ({
+        x: depthData.x,
+        bid: depthData.bid || 0,
+        ask: depthData.ask || 0,
+      }));
+
+      setMarketDepthData(formattedData);
     }
   }, [marketDepth]);
 
   return (
-    <Card>
+    <Card className="col-span-12 lg:col-span-8">
       <CardHeader>
         <CardTitle>Market Depth Chart</CardTitle>
         <CardDescription>Live Market Depth (Bids and Asks)</CardDescription>
@@ -80,7 +92,7 @@ const MarketDepthChart: React.FC<MarketDepthChartProps> = ({ orderBook }) => {
           <CartesianGrid vertical={false} />
           <XAxis
             dataKey="x"
-            tickFormatter={(value) => value.toFixed(2)} // Format X-axis to show price levels
+            tickFormatter={(value) => value.toFixed(2)}
             tickLine={false}
             axisLine={false}
             tickMargin={8}
@@ -90,7 +102,7 @@ const MarketDepthChart: React.FC<MarketDepthChartProps> = ({ orderBook }) => {
           <Line
             type="linear"
             dataKey="bid"
-            stroke="green" // Color for bids
+            stroke="green"
             strokeWidth={2}
             dot={false}
             activeDot={{ r: 6 }}
@@ -98,7 +110,7 @@ const MarketDepthChart: React.FC<MarketDepthChartProps> = ({ orderBook }) => {
           <Line
             type="linear"
             dataKey="ask"
-            stroke="red" // Color for asks
+            stroke="red"
             strokeWidth={2}
             dot={false}
             activeDot={{ r: 6 }}

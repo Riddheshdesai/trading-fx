@@ -7,7 +7,7 @@ export function useOrderBook(symbol: string) {
     queryFn: () =>
       new Promise((resolve, reject) => {
         const ws = new WebSocket(
-          `wss://stream.binance.com:9443/ws/${symbol}@depth`
+          `${process.env.NEXT_PUBLIC_BINANCE_WS_URL}/ws/${symbol}@depth`
         );
         ws.onopen = () => {
           console.log(`WebSocket connection established for ${symbol}`);

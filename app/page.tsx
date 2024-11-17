@@ -7,6 +7,7 @@ export default function Home() {
   return (
     <>
       <DefaultLayout>
+        {/* <div className="p-10">hahah</div> */}
         <FxPairData />
       </DefaultLayout>
     </>

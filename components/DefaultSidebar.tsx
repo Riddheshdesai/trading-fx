@@ -4,6 +4,7 @@ import React from "react";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
 import { useSymbolStore } from "@/store/useTradingStore";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface SidebarProps {
   sidebarOpen: boolean;
@@ -30,11 +31,12 @@ const tradingPairs = {
 
 const DefaultSidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
   const pathname = usePathname();
-  const { setSymbol } = useSymbolStore();
+  const { symbol, setSymbol } = useSymbolStore();
+  const isMobile = useIsMobile();
 
   return (
     <aside
-      className={`absolute left-0 top-0 z-9999 flex h-screen w-72.5 flex-col overflow-y-hidden border-r border-stroke bg-[#520074] text-[#fcf3ff] lg:static lg:translate-x-0 ${
+      className={`absolute left-0 top-0 z-[999] flex h-screen w-72.5 flex-col overflow-y-hidden border-r border-stroke bg-[#520074] text-[#fcf3ff] lg:static lg:translate-x-0 ${
         sidebarOpen
           ? "translate-x-0 duration-300 ease-linear"
           : "-translate-x-full"
@@ -50,19 +52,24 @@ const DefaultSidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
         />
         <header className="text-2xl font-semibold">Fx Trding</header>
       </div>
+      <h3 className="px-4 lg:px-6 font-medium text-[#f2ceff] text-lg">
+        Crypto Pairs
+      </h3>
 
       <div className="no-scrollbar flex flex-col overflow-y-auto duration-300 ease-linear">
         <nav className="mt-1 px-4 lg:px-6">
-          <h3 className="py-1 font-medium text-[#f2ceff] text-lg">
-            Crypto Pairs
-          </h3>
           <ul className="p-4">
             {Object.keys(tradingPairs).map((Pair) => {
               return (
                 <li
                   key={tradingPairs[Pair]}
-                  className="py-2 font-light text-[16px] text-[#e8a7ff] cursor-pointer hover:text-[#f8e4ff]"
-                  onClick={() => setSymbol(Pair)}
+                  className={`py-2 font-light text-[16px] text-[#e8a7ff] cursor-pointer hover:text-[#f8e4ff] ${
+                    symbol === Pair ? "text-[#FFFFFF] font-semibold" : "text-[#e8a7ff]"
+                  } `}
+                  onClick={() => {
+                    setSymbol(Pair);
+                    isMobile && setSidebarOpen(false);
+                  }}
                 >
                   {tradingPairs[Pair]}
                 </li>
