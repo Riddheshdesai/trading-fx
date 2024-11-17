@@ -1,6 +1,6 @@
 # Real-Time Cryptocurrency Orderbook and Market Indicators
 
-![Customer Activity Dashboard](https://github.com/Riddheshdesai/Activity-Dashboard/blob/develop/crypto-dashboard.jpg)
+![Customer Activity Dashboard](https://github.com/Riddheshdesai/trading-fx/blob/main/public/crypto-trading-dahboard.jpg)
 
 ## Overview
 
