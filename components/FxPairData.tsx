@@ -5,9 +5,9 @@ import { useSymbolStore } from "@/store/useTradingStore";
 import React from "react";
 import OrderBook from "./Orderbook";
 import DyanamicLineChart from "./DyanamicLineChart";
-import MarketDepthChart from "./MarketDepthChart";
 import OrderbookImbalance from "./OrderbookImbalance";
 import Loader from "./Loader";
+import MarketDepth from "./MarketDepth";
 
 export default function FxPairData() {
   const { symbol } = useSymbolStore();
@@ -29,7 +29,7 @@ export default function FxPairData() {
       <OrderBook orderBook={data} />
       <DyanamicLineChart orderBook={data} />
       <OrderbookImbalance orderBook={data} />
-      <MarketDepthChart orderBook={data} />
+      <MarketDepth orderBook={data} />
     </div>
   );
 }

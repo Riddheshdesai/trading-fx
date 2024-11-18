@@ -1,6 +1,4 @@
 "use client";
-import { useOrderBook } from "@/hooks/use-orderblock";
-import { useSymbolStore } from "@/store/useTradingStore";
 import { Card } from "./ui/card";
 
 interface OrderBookProps {
@@ -19,7 +17,6 @@ const OrderBook: React.FC<OrderBookProps> = ({ orderBook }) => {
                 key={index}
                 className="flex justify-between py-2 px-2 lg:px-2 xl:px-4 border-b"
               >
-                {/* <span className="text-red-500">{price.toFixed(2)}</span>/ */}
                 <span className="text-red-500">{quantity.toFixed(2)}</span>
               </li>
             ))}
